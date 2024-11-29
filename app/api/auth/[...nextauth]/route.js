@@ -32,16 +32,17 @@ const authOptions = {
 	callbacks: {
 		async jwt({ token, user, account }) {
 			if (account?.provider === "credentials" && user) {
+				token.id = user.id;
 				token.name = user.name || "";
 				token.email = user.email || "";
 			}
 			return token;
 		},
 		async session({ session, token }) {
-			session.user = session.user || {}; // Inisialisasi jika null/undefined
-			if (token?.email) {
-				session.user.email = token.email;
-			}
+			session.user = session.user || {};
+			session.user.id = token.id;
+			session.user.name = token.name;
+			session.user.email = token.email;
 			return session;
 		}
 	},

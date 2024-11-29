@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const jetbrainsMono = JetBrainsMono({
 	subsets: ["latin"],
@@ -18,11 +19,13 @@ const plusJakartaSans = PlusJakartaSans({
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<body className={cn("font-sans antialiased", [plusJakartaSans.variable, jetbrainsMono.variable])}>
 				<SessionProvider>
-					{children}
-					<Toaster position="top-right" richColors />
+					<ThemeProvider attribute="class" defaultTheme="light">
+						{children}
+						<Toaster position="top-right" richColors />
+					</ThemeProvider>
 				</SessionProvider>
 			</body>
 		</html>
