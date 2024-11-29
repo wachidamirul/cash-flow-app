@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-// This function can be marked `async` if using `await` inside
-export function middleware(request) {
-  const isLoggedIn = false;
-  if (!isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+const AUTH_SECRET = process.env.NEXT_AUTH_SECRET;
+
+export async function middleware(req) {
+	const token = await getToken({ req, secret: AUTH_SECRET });
+
+	if (!token) {
+		return NextResponse.redirect(new URL("/login", req.url));
+	}
+
+	return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: "/",
+	matcher: ["/"]
 };

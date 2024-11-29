@@ -1,3 +1,5 @@
+import { loginUser } from "@/lib/firebase/service";
+import { compare } from "bcrypt";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -15,30 +17,28 @@ const authOptions = {
 				password: { label: "Password", type: "password" }
 			},
 			async authorize(credentials) {
-				const user = {
-					id: 1,
-					name: "Joko",
-					email: "joko@example.test"
-				};
-				if (credentials.email === "joko@example.test" && credentials.password === "12345678") {
-					return user;
-				} else {
+				const user = await loginUser(credentials);
+				if (user) {
+					const passwordConfirmed = await compare(credentials.password, user.password);
+					if (passwordConfirmed) {
+						return user;
+					}
 					return null;
 				}
+				return null;
 			}
 		})
 	],
 	callbacks: {
 		async jwt({ token, user, account }) {
-			if (account?.provider === "credentials") {
-				if (user) {
-					token.name = user.name;
-					token.email = user.email;
-				}
+			if (account?.provider === "credentials" && user) {
+				token.name = user.name || "";
+				token.email = user.email || "";
 			}
 			return token;
 		},
 		async session({ session, token }) {
+			session.user = session.user || {}; // Inisialisasi jika null/undefined
 			if (token?.email) {
 				session.user.email = token.email;
 			}
