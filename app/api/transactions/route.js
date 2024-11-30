@@ -1,4 +1,4 @@
-import { transaction, transactionById } from "@/lib/firebase/service";
+import { deleteTransaction, transaction, transactionById } from "@/lib/firebase/service";
 import { NextResponse } from "next/server";
 
 export const GET = async request => {
@@ -22,6 +22,24 @@ export const GET = async request => {
 			status: 200,
 			message: "success",
 			data: allTransactions
+		});
+	} catch (error) {
+		return NextResponse.json({
+			status: 500,
+			message: "Internal Server Error",
+			error: error.message
+		});
+	}
+};
+
+export const DELETE = async request => {
+	try {
+		const searchParams = request.nextUrl.searchParams;
+		const id = searchParams.get("id");
+		await deleteTransaction(id);
+		return NextResponse.json({
+			status: 200,
+			message: "success"
 		});
 	} catch (error) {
 		return NextResponse.json({

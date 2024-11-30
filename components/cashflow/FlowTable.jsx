@@ -4,12 +4,10 @@ import { format } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Trash } from "lucide-react";
 import { PencilLine } from "lucide-react";
+import DeleteAlert from "./DeleteAlert";
 
-export const FlowTable = data => {
-	const entries = data.data || [];
-
+export const FlowTable = ({ data, onDelete }) => {
 	return (
 		<Table>
 			<TableHeader className="border-b bg-primary/10">
@@ -22,8 +20,8 @@ export const FlowTable = data => {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{entries.length > 0 ? (
-					entries.map(entry => (
+				{data.length > 0 ? (
+					data.map(entry => (
 						<TableRow key={entry.id}>
 							<TableCell>{format(new Date(entry.date * 1000), "dd-MM-yyyy HH:mm")}</TableCell>
 							<TableCell>{entry.title}</TableCell>
@@ -35,9 +33,7 @@ export const FlowTable = data => {
 								}).format(entry.amount)}
 							</TableCell>
 							<TableCell className="flex justify-end gap-2">
-								<Button variant="destructive" size="icon">
-									<Trash />
-								</Button>
+								<DeleteAlert id={entry.id} onDelete={onDelete} />
 								<Button variant="outline" size="icon">
 									<PencilLine />
 								</Button>

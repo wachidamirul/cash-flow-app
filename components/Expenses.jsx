@@ -13,8 +13,7 @@ const chartConfig = {
 	}
 };
 
-const Expenses = data => {
-	const resData = data.data || [];
+const Expenses = ({ data }) => {
 	const [totalAmount, setTotalAmount] = useState(0);
 	const [chartData, setChartData] = useState([]);
 
@@ -29,10 +28,10 @@ const Expenses = data => {
 	};
 
 	useEffect(() => {
-		setAmount(resData);
-		const processedData = processChartData(resData, "expense");
+		setAmount(data);
+		const processedData = processChartData(data, "expense");
 		setChartData(processedData);
-	}, [resData]);
+	}, [data]);
 
 	return (
 		<Card className="w-full max-h-fit overflow-hidden">

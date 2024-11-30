@@ -16,10 +16,10 @@ const PageClient = () => {
 	const userData = session?.user;
 
 	const [isTransaction, setIsTransaction] = useState([]);
-	const [dataFetched, setDataFetched] = useState(false); // Flag to track if data has been fetched
+	const [dataFetched, setDataFetched] = useState(false);
 
 	const fetchTransactions = async () => {
-		if (!userData?.id || dataFetched) return; // Prevent fetching if data is already fetched
+		if (!userData?.id || dataFetched) return;
 
 		try {
 			const url = new URL(`/api/transactions`, window.location.origin);
@@ -32,14 +32,15 @@ const PageClient = () => {
 			}
 
 			const result = await response.json();
-
-			console.log(result);
-
 			setIsTransaction(result.data || []);
-			setDataFetched(true); // Set flag to true after data is fetched
+			setDataFetched(true);
 		} catch (error) {
 			throw new Error("Failed to fetch transactions");
 		}
+	};
+
+	const handleDelete = idDelete => {
+		setIsTransaction(prevTransactions => prevTransactions.filter(transaction => transaction.id !== idDelete));
 	};
 
 	useEffect(() => {
@@ -64,7 +65,7 @@ const PageClient = () => {
 
 						<Card>
 							<CardContent className="pt-6">
-								<FlowTable data={isTransaction} />
+								<FlowTable data={isTransaction} onDelete={handleDelete} />
 							</CardContent>
 						</Card>
 					</div>
