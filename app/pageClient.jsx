@@ -16,9 +16,10 @@ const PageClient = () => {
 	const userData = session?.user;
 
 	const [isTransaction, setIsTransaction] = useState([]);
+	const [dataFetched, setDataFetched] = useState(false); // Flag to track if data has been fetched
 
 	const fetchTransactions = async () => {
-		if (!userData?.id) return;
+		if (!userData?.id || dataFetched) return; // Prevent fetching if data is already fetched
 
 		try {
 			const url = new URL(`/api/transactions`, window.location.origin);
@@ -31,17 +32,21 @@ const PageClient = () => {
 			}
 
 			const result = await response.json();
+
+			console.log(result);
+
 			setIsTransaction(result.data || []);
+			setDataFetched(true); // Set flag to true after data is fetched
 		} catch (error) {
 			throw new Error("Failed to fetch transactions");
 		}
 	};
 
 	useEffect(() => {
-		if (session) {
+		if (session && !dataFetched) {
 			fetchTransactions();
 		}
-	}, [session]);
+	}, [session, dataFetched]);
 
 	return (
 		<div className="relative">
