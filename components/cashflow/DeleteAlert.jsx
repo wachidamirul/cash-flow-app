@@ -15,11 +15,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 const DeleteAlert = ({ id, onDelete }) => {
+	const { data: session } = useSession();
+	const userData = session?.user;
+
 	const handleDelete = async idDelete => {
 		try {
 			const url = new URL(`/api/transactions`, window.location.origin);
+			url.searchParams.append("userId", userData.id);
 			url.searchParams.append("id", idDelete);
 			const response = await fetch(url, {
 				method: "DELETE",
@@ -32,12 +37,13 @@ const DeleteAlert = ({ id, onDelete }) => {
 				throw new Error("Failed to delete transaction");
 			}
 
-			onDelete(idDelete);
+			await onDelete();
 
 			toast.success("Success", {
 				description: "Transaction deleted successfully"
 			});
 		} catch (error) {
+			console.log("Error deleting transaction:", error);
 			toast.error("Error", {
 				description: "Failed to delete transaction"
 			});

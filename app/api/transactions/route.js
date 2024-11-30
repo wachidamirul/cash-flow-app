@@ -1,4 +1,4 @@
-import { deleteTransaction, transaction, transactionById } from "@/lib/firebase/service";
+import { addTransaction, deleteTransaction, transaction, transactionById } from "@/lib/firebase/service";
 import { NextResponse } from "next/server";
 
 export const GET = async request => {
@@ -6,7 +6,13 @@ export const GET = async request => {
 		const searchParams = request.nextUrl.searchParams;
 		const id = searchParams.get("id");
 		const userId = searchParams.get("userId");
-		const lastVisible = searchParams.get("lastVisible");
+
+		if (!userId) {
+			return NextResponse.json({
+				status: 401,
+				message: "Unauthorized"
+			});
+		}
 
 		if (id) {
 			const transactionDetail = await transactionById(id);
@@ -17,7 +23,7 @@ export const GET = async request => {
 			});
 		}
 
-		const allTransactions = await transaction(userId, lastVisible);
+		const allTransactions = await transaction(userId);
 		return NextResponse.json({
 			status: 200,
 			message: "success",
@@ -32,10 +38,48 @@ export const GET = async request => {
 	}
 };
 
+export const POST = async request => {
+	try {
+		const searchParams = request.nextUrl.searchParams;
+		const userId = searchParams.get("userId");
+
+		if (!userId) {
+			return NextResponse.json({
+				status: 401,
+				message: "Unauthorized"
+			});
+		}
+		const req = await request.json();
+		const res = await addTransaction(req, userId);
+		return NextResponse.json(
+			{
+				status: res.status,
+				message: res.message
+			},
+			{ status: res.statusCode }
+		);
+	} catch (error) {
+		return NextResponse.json({
+			status: 500,
+			message: "Internal Server Error",
+			error: error.message
+		});
+	}
+};
+
 export const DELETE = async request => {
 	try {
 		const searchParams = request.nextUrl.searchParams;
 		const id = searchParams.get("id");
+		const userId = searchParams.get("userId");
+
+		if (!userId) {
+			return NextResponse.json({
+				status: 401,
+				message: "Unauthorized"
+			});
+		}
+
 		await deleteTransaction(id);
 		return NextResponse.json({
 			status: 200,

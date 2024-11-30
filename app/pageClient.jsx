@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Balance from "@/components/Balance";
-import { FlowForm } from "@/components/cashflow/FlowForm";
+import { AddTransaction } from "@/components/cashflow/AddTransaction";
 import { FlowTable } from "@/components/cashflow/FlowTable";
 import Expenses from "@/components/Expenses";
 import Income from "@/components/Income";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 const PageClient = () => {
 	const { data: session } = useSession();
@@ -24,7 +25,6 @@ const PageClient = () => {
 		try {
 			const url = new URL(`/api/transactions`, window.location.origin);
 			url.searchParams.append("userId", userData.id);
-
 			const response = await fetch(url);
 
 			if (!response.ok) {
@@ -35,12 +35,23 @@ const PageClient = () => {
 			setIsTransaction(result.data || []);
 			setDataFetched(true);
 		} catch (error) {
-			throw new Error("Failed to fetch transactions");
+			console.error("Error fetching transactions:", error);
+			toast.error("Error", {
+				description: "Error fetching transactions:"
+			});
 		}
 	};
 
-	const handleDelete = idDelete => {
-		setIsTransaction(prevTransactions => prevTransactions.filter(transaction => transaction.id !== idDelete));
+	const handleOnChange = async () => {
+		try {
+			setDataFetched(false);
+			await fetchTransactions();
+		} catch (error) {
+			console.error("Error refreshing transactions:", error);
+			toast.error("Error", {
+				description: "Error refreshing transactions:"
+			});
+		}
 	};
 
 	useEffect(() => {
@@ -60,12 +71,12 @@ const PageClient = () => {
 					</div>
 					<div className="space-y-6">
 						<div className="flex items-center justify-end">
-							<FlowForm />
+							<AddTransaction onAdd={handleOnChange} />
 						</div>
 
 						<Card>
 							<CardContent className="pt-6">
-								<FlowTable data={isTransaction} onDelete={handleDelete} />
+								<FlowTable data={isTransaction} onDelete={handleOnChange} />
 							</CardContent>
 						</Card>
 					</div>
