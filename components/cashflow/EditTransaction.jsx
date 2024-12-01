@@ -47,7 +47,7 @@ const EditTransaction = ({ data, onEdit }) => {
 		if (isOpen) {
 			form.reset(formDefaultValues);
 		}
-	}, [isOpen, form]);
+	}, [isOpen, form, formDefaultValues]);
 
 	const onSubmit = async values => {
 		setIsSubmitting(true);
