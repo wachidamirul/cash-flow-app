@@ -22,7 +22,7 @@ export const FlowTable = ({ data, onRefresh }) => {
 				{data.length > 0 ? (
 					data.map(entry => (
 						<TableRow key={entry.id}>
-							<TableCell>{format(new Date(entry.date * 1000), "dd-MM-yyyy HH:mm")}</TableCell>
+							<TableCell>{format(new Date(entry.date * 1000), "dd MMM yyyy, HH:mm")}</TableCell>
 							<TableCell>{entry.title}</TableCell>
 							<TableCell>{entry.type}</TableCell>
 							<TableCell className={cn("text-right", entry.type === "income" ? "text-green-600" : "text-red-600")}>

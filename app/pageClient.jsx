@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { WelcomeBanner } from "@/components/WelcomeBanner";
 
 const PageClient = () => {
 	const { data: session } = useSession();
@@ -66,6 +67,7 @@ const PageClient = () => {
 		<div className="relative">
 			<div className="container mx-auto">
 				<div className="my-24 mx-8 space-y-12">
+					<WelcomeBanner name={userData?.name} />
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
 						<Balance data={transactions} />
 						<Income data={transactions} />

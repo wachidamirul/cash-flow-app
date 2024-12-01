@@ -45,7 +45,7 @@ const Balance = ({ data }) => {
 						accessibilityLayer
 						data={chartData}
 						margin={{
-							top: 5,
+							top: 10,
 							left: 0,
 							right: 0
 						}}>
