@@ -46,7 +46,7 @@ export const AddTransaction = ({ onAdd }) => {
 		if (isOpen) {
 			form.reset(formDefaultValues);
 		}
-	}, [isOpen, form, formDefaultValues]);
+	}, [isOpen, form]);
 
 	const onSubmit = async values => {
 		setIsSubmitting(true);
