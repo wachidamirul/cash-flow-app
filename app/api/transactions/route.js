@@ -1,5 +1,26 @@
-import { addTransaction, deleteTransaction, transaction, transactionById } from "@/lib/firebase/service";
+import {
+	addTransaction,
+	deleteTransaction,
+	editTransaction,
+	transaction,
+	transactionById
+} from "@/lib/firebase/service";
 import { NextResponse } from "next/server";
+
+const handleUnauthorized = () => {
+	return NextResponse.json({
+		status: 401,
+		message: "Unauthorized"
+	});
+};
+
+const handleError = error => {
+	return NextResponse.json({
+		status: 500,
+		message: "Internal Server Error",
+		error: error.message
+	});
+};
 
 export const GET = async request => {
 	try {
@@ -8,17 +29,14 @@ export const GET = async request => {
 		const userId = searchParams.get("userId");
 
 		if (!userId) {
-			return NextResponse.json({
-				status: 401,
-				message: "Unauthorized"
-			});
+			return handleUnauthorized();
 		}
 
 		if (id) {
 			const transactionDetail = await transactionById(id);
 			return NextResponse.json({
 				status: transactionDetail ? 200 : 404,
-				message: transactionDetail ? "success" : "transaction not found",
+				message: transactionDetail ? "Success" : "Transaction not found",
 				data: transactionDetail || {}
 			});
 		}
@@ -26,15 +44,35 @@ export const GET = async request => {
 		const allTransactions = await transaction(userId);
 		return NextResponse.json({
 			status: 200,
-			message: "success",
+			message: "Success",
 			data: allTransactions
 		});
 	} catch (error) {
-		return NextResponse.json({
-			status: 500,
-			message: "Internal Server Error",
-			error: error.message
-		});
+		return handleError(error);
+	}
+};
+
+export const PUT = async request => {
+	try {
+		const searchParams = request.nextUrl.searchParams;
+		const id = searchParams.get("id");
+		const userId = searchParams.get("userId");
+
+		if (!userId) {
+			return handleUnauthorized();
+		}
+
+		const req = await request.json();
+		const res = await editTransaction(req, userId, id);
+		return NextResponse.json(
+			{
+				status: res.status,
+				message: res.message
+			},
+			{ status: res.statusCode }
+		);
+	} catch (error) {
+		return handleError(error);
 	}
 };
 
@@ -44,11 +82,9 @@ export const POST = async request => {
 		const userId = searchParams.get("userId");
 
 		if (!userId) {
-			return NextResponse.json({
-				status: 401,
-				message: "Unauthorized"
-			});
+			return handleUnauthorized();
 		}
+
 		const req = await request.json();
 		const res = await addTransaction(req, userId);
 		return NextResponse.json(
@@ -59,11 +95,7 @@ export const POST = async request => {
 			{ status: res.statusCode }
 		);
 	} catch (error) {
-		return NextResponse.json({
-			status: 500,
-			message: "Internal Server Error",
-			error: error.message
-		});
+		return handleError(error);
 	}
 };
 
@@ -74,22 +106,18 @@ export const DELETE = async request => {
 		const userId = searchParams.get("userId");
 
 		if (!userId) {
-			return NextResponse.json({
-				status: 401,
-				message: "Unauthorized"
-			});
+			return handleUnauthorized();
 		}
 
-		await deleteTransaction(id);
-		return NextResponse.json({
-			status: 200,
-			message: "success"
-		});
+		const res = await deleteTransaction(id, userId);
+		return NextResponse.json(
+			{
+				status: res.status,
+				message: res.message
+			},
+			{ status: res.statusCode }
+		);
 	} catch (error) {
-		return NextResponse.json({
-			status: 500,
-			message: "Internal Server Error",
-			error: error.message
-		});
+		return handleError(error);
 	}
 };

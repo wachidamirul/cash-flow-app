@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Area, AreaChart } from "recharts";
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { processChartData } from "@/lib/chartUtils";
 
 const chartConfig = {
@@ -14,11 +14,8 @@ const chartConfig = {
 };
 
 const Balance = ({ data }) => {
-	const [totalAmount, setTotalAmount] = useState(0);
-	const [chartData, setChartData] = useState([]);
-
-	const setAmount = resData => {
-		const totalBalance = resData.reduce((acc, item) => {
+	const totalAmount = useMemo(() => {
+		return data.reduce((acc, item) => {
 			if (item.type === "income") {
 				return acc + item.amount;
 			}
@@ -27,15 +24,9 @@ const Balance = ({ data }) => {
 			}
 			return acc;
 		}, 0);
-		setTotalAmount(totalBalance);
-	};
-
-	useEffect(() => {
-		setAmount(data);
-
-		const processedData = processChartData(data, "balance");
-		setChartData(processedData);
 	}, [data]);
+
+	const chartData = useMemo(() => processChartData(data, "balance"), [data]);
 
 	return (
 		<Card className="w-full max-h-fit overflow-hidden">

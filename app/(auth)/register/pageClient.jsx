@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/lib/schemas/auth";
 import { useRouter } from "next/navigation";
-import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 
@@ -45,10 +44,14 @@ const RegisterPageClient = () => {
 				password: values.password
 			});
 			setLoading(false);
-			toast.success("Register Success");
+			toast.success("Success", {
+				description: "Register success"
+			});
 			push("/");
 		} else {
-			toast.error("Register Failed");
+			toast.error("Error", {
+				description: "Failed to register"
+			});
 			setLoading(false);
 		}
 	};
@@ -69,7 +72,6 @@ const RegisterPageClient = () => {
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
 					name="email"
@@ -83,7 +85,6 @@ const RegisterPageClient = () => {
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
 					name="password"
@@ -98,7 +99,7 @@ const RegisterPageClient = () => {
 										variant="ghost"
 										size="sm"
 										className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-										onClick={() => setShowPassword(!showPassword)}>
+										onClick={() => setShowPassword(prev => !prev)}>
 										{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 									</Button>
 								</div>
@@ -107,7 +108,6 @@ const RegisterPageClient = () => {
 						</FormItem>
 					)}
 				/>
-
 				<Button type="submit" className="w-full" disabled={isLoading}>
 					{isLoading ? <LoaderCircle className="animate-spin" /> : "Create account"}
 				</Button>

@@ -16,7 +16,7 @@ const PageClient = () => {
 	const { data: session } = useSession();
 	const userData = session?.user;
 
-	const [isTransaction, setIsTransaction] = useState([]);
+	const [transactions, setTransactions] = useState([]);
 	const [dataFetched, setDataFetched] = useState(false);
 
 	const fetchTransactions = async () => {
@@ -28,16 +28,18 @@ const PageClient = () => {
 			const response = await fetch(url);
 
 			if (!response.ok) {
-				throw new Error("Failed to fetch transactions");
+				toast.error("Error", {
+					description: "Failed to fetch transactions. Please try again."
+				});
 			}
 
 			const result = await response.json();
-			setIsTransaction(result.data || []);
+			setTransactions(result.data || []);
 			setDataFetched(true);
 		} catch (error) {
 			console.error("Error fetching transactions:", error);
 			toast.error("Error", {
-				description: "Error fetching transactions:"
+				description: "Failed to fetch transactions. Please try again."
 			});
 		}
 	};
@@ -47,9 +49,9 @@ const PageClient = () => {
 			setDataFetched(false);
 			await fetchTransactions();
 		} catch (error) {
-			console.error("Error refreshing transactions:", error);
+			console.error("Error fetching transactions:", error);
 			toast.error("Error", {
-				description: "Error refreshing transactions:"
+				description: "Failed to fetch transactions. Please try again."
 			});
 		}
 	};
@@ -65,9 +67,9 @@ const PageClient = () => {
 			<div className="container mx-auto">
 				<div className="my-24 mx-8 space-y-12">
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-						<Balance data={isTransaction} />
-						<Income data={isTransaction} />
-						<Expenses data={isTransaction} />
+						<Balance data={transactions} />
+						<Income data={transactions} />
+						<Expenses data={transactions} />
 					</div>
 					<div className="space-y-6">
 						<div className="flex items-center justify-end">
@@ -76,7 +78,7 @@ const PageClient = () => {
 
 						<Card>
 							<CardContent className="pt-6">
-								<FlowTable data={isTransaction} onDelete={handleOnChange} />
+								<FlowTable data={transactions} onRefresh={handleOnChange} />
 							</CardContent>
 						</Card>
 					</div>

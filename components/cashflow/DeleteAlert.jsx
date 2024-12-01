@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -17,15 +16,16 @@ import { Trash } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
-const DeleteAlert = ({ id, onDelete }) => {
+const DeleteAlert = ({ data, onDelete }) => {
 	const { data: session } = useSession();
 	const userData = session?.user;
 
-	const handleDelete = async idDelete => {
+	const handleDelete = async () => {
 		try {
 			const url = new URL(`/api/transactions`, window.location.origin);
 			url.searchParams.append("userId", userData.id);
-			url.searchParams.append("id", idDelete);
+			url.searchParams.append("id", data.id);
+
 			const response = await fetch(url, {
 				method: "DELETE",
 				headers: {
@@ -33,17 +33,18 @@ const DeleteAlert = ({ id, onDelete }) => {
 				}
 			});
 
-			if (!response.ok) {
-				throw new Error("Failed to delete transaction");
+			if (response.ok) {
+				await onDelete();
+				toast.success("Success", {
+					description: "Transaction deleted successfully"
+				});
+			} else {
+				toast.error("Error", {
+					description: "Failed to delete transaction"
+				});
 			}
-
-			await onDelete();
-
-			toast.success("Success", {
-				description: "Transaction deleted successfully"
-			});
 		} catch (error) {
-			console.log("Error deleting transaction:", error);
+			console.error("Error deleting transaction:", error);
 			toast.error("Error", {
 				description: "Failed to delete transaction"
 			});
@@ -66,7 +67,7 @@ const DeleteAlert = ({ id, onDelete }) => {
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={() => handleDelete(id)}>
+					<AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>
 						Continue
 					</AlertDialogAction>
 				</AlertDialogFooter>

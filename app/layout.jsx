@@ -20,7 +20,7 @@ const plusJakartaSans = PlusJakartaSans({
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={cn("font-sans antialiased", [plusJakartaSans.variable, jetbrainsMono.variable])}>
+			<body className={cn("font-sans antialiased", jetbrainsMono.variable, plusJakartaSans.variable)}>
 				<SessionProvider>
 					<ThemeProvider attribute="class" defaultTheme="light">
 						{children}

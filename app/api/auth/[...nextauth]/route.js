@@ -18,14 +18,12 @@ const authOptions = {
 			},
 			async authorize(credentials) {
 				const user = await loginUser(credentials);
-				if (user) {
-					const passwordConfirmed = await compare(credentials.password, user.password);
-					if (passwordConfirmed) {
-						return user;
-					}
-					return null;
-				}
-				return null;
+				if (!user) return null;
+
+				const passwordConfirmed = await compare(credentials.password, user.password);
+				if (!passwordConfirmed) return null;
+
+				return user;
 			}
 		})
 	],
@@ -39,10 +37,12 @@ const authOptions = {
 			return token;
 		},
 		async session({ session, token }) {
-			session.user = session.user || {};
-			session.user.id = token.id;
-			session.user.name = token.name;
-			session.user.email = token.email;
+			session.user = {
+				...session.user,
+				id: token.id,
+				name: token.name,
+				email: token.email
+			};
 			return session;
 		}
 	},

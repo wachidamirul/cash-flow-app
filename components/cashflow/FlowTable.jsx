@@ -2,12 +2,11 @@
 
 import { format } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { PencilLine } from "lucide-react";
 import DeleteAlert from "./DeleteAlert";
+import EditTransaction from "./EditTransaction";
 
-export const FlowTable = ({ data, onDelete }) => {
+export const FlowTable = ({ data, onRefresh }) => {
 	return (
 		<Table>
 			<TableHeader className="border-b bg-primary/10">
@@ -33,10 +32,8 @@ export const FlowTable = ({ data, onDelete }) => {
 								}).format(entry.amount)}
 							</TableCell>
 							<TableCell className="flex justify-end gap-2">
-								<DeleteAlert id={entry.id} onDelete={onDelete} />
-								<Button variant="outline" size="icon">
-									<PencilLine />
-								</Button>
+								<DeleteAlert data={entry} onDelete={onRefresh} />
+								<EditTransaction data={entry} onEdit={onRefresh} />
 							</TableCell>
 						</TableRow>
 					))

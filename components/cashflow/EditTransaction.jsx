@@ -23,18 +23,19 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { PencilLine } from "lucide-react";
 
-export const AddTransaction = ({ onAdd }) => {
+const EditTransaction = ({ data, onEdit }) => {
 	const { data: session } = useSession();
 	const userData = session?.user;
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 
 	const formDefaultValues = {
-		title: "",
-		amount: 0,
-		type: "income",
-		date: new Date()
+		title: data.title,
+		amount: data.amount,
+		type: data.type,
+		date: new Date(data.date * 1000)
 	};
 
 	const form = useForm({
@@ -51,52 +52,49 @@ export const AddTransaction = ({ onAdd }) => {
 	const onSubmit = async values => {
 		setIsSubmitting(true);
 		try {
-			const valuesToSend = {
+			const updatedValues = {
 				...values,
 				date: getUnixTime(values.date),
-				id_user: userData.id
+				userId: userData.id
 			};
 
 			const url = new URL(`/api/transactions`, window.location.origin);
+			url.searchParams.append("id", data.id);
 			url.searchParams.append("userId", userData.id);
+
 			const response = await fetch(url, {
-				method: "POST",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json"
 				},
-				body: JSON.stringify(valuesToSend)
+				body: JSON.stringify(updatedValues)
 			});
 
 			if (response.ok) {
-				await onAdd();
-				toast.success("Success", {
-					description: "Cash flow added successfully"
-				});
+				await onEdit();
+				toast.success("Success", { description: "Cash flow updated successfully" });
 				form.reset(formDefaultValues);
 				setIsOpen(false);
 			} else {
-				toast.error("Error", {
-					description: "Failed to add cash flow. Please try again."
-				});
+				throw new Error("Failed to update cash flow");
 			}
 		} catch (error) {
-			console.error("Error adding cash flow:", error);
-			toast.error("Error", {
-				description: "Failed to add cash flow. Please try again."
-			});
+			console.error("Failed to update cash flow:", error);
+			toast.error("Error", { description: "Failed to update cash flow" });
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
-
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button>Add Cash Flow</Button>
+				<Button variant="outline" size="icon">
+					<PencilLine />
+				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
-					<DialogTitle>Add Cash Flow</DialogTitle>
+					<DialogTitle>Edit Cash Flow</DialogTitle>
 					<DialogDescription>Enter the details for your new cash flow here.</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
@@ -205,3 +203,5 @@ export const AddTransaction = ({ onAdd }) => {
 		</Dialog>
 	);
 };
+
+export default EditTransaction;

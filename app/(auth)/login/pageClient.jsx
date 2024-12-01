@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/lib/schemas/auth";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const LoginPageClient = () => {
@@ -35,13 +34,16 @@ const LoginPageClient = () => {
 			password: values.password
 		});
 
+		setLoading(false);
 		if (res.status === 200) {
-			setLoading(false);
-			toast.success("Login Success");
+			toast.success("Success", {
+				description: "Login success"
+			});
 			push("/");
 		} else {
-			setLoading(false);
-			toast.error("Email or password is incorrect");
+			toast.error("Error", {
+				description: "Email or password is incorrect"
+			});
 		}
 	};
 
@@ -55,7 +57,7 @@ const LoginPageClient = () => {
 						<FormItem>
 							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input placeholder="Enter your email" {...field} />
+								<Input placeholder="Masukkan email Anda" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -70,13 +72,13 @@ const LoginPageClient = () => {
 							<FormLabel>Password</FormLabel>
 							<FormControl>
 								<div className="relative">
-									<Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} />
+									<Input type={showPassword ? "text" : "password"} placeholder="Masukkan password Anda" {...field} />
 									<Button
 										type="button"
 										variant="ghost"
 										size="sm"
 										className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-										onClick={() => setShowPassword(!showPassword)}>
+										onClick={() => setShowPassword(prev => !prev)}>
 										{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 									</Button>
 								</div>
@@ -87,7 +89,7 @@ const LoginPageClient = () => {
 				/>
 
 				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? <LoaderCircle className="animate-spin" /> : "Sign in"}
+					{isLoading ? <LoaderCircle className="animate-spin" /> : "Masuk"}
 				</Button>
 			</form>
 		</Form>
