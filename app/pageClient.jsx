@@ -12,6 +12,7 @@ import { LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
+import { Footer } from "@/components/Footer";
 
 const PageClient = () => {
 	const { data: session } = useSession();
@@ -84,6 +85,7 @@ const PageClient = () => {
 							</CardContent>
 						</Card>
 					</div>
+					<Footer />
 				</div>
 			</div>
 
