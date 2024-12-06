@@ -14,7 +14,7 @@ export function Footer() {
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-muted-foreground hover:text-primary transition-colors">
-						<Github className="h-6 w-6" />
+						<Github className="h-6 w-6" /> Github Source Code
 						<span className="sr-only">GitHub repository</span>
 					</Link>
 				</div>
